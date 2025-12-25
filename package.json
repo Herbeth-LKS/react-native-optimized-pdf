@@ -1,0 +1,32 @@
+{
+  "name": "react-native-optimized-pdf",
+  "version": "1.0.0",
+  "description": "High-performance PDF viewer for React Native with optimized memory usage",
+  "main": "index.ts",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "pdf",
+    "viewer",
+    "ios",
+    "performance"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-native": "^0.72.0",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/react-native-optimized-pdf"
+  }
+}
