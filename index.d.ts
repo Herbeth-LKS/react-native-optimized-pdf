@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { ViewStyle } from 'react-native';
+import { PdfSource } from './src/OptimizedPdfView';
 
 export interface OptimizedPdfViewProps {
-  source: string;
-  page?: number;
+  source: PdfSource;
   maximumZoom?: number;
   style?: ViewStyle;
   onPdfLoadComplete?: (event: {
