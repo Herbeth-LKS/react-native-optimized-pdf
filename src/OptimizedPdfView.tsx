@@ -37,6 +37,7 @@ const NativeOptimizedPdfView =
  */
 export default function OptimizedPdfView({
   source,
+  password,
   maximumZoom = DEFAULT_MAXIMUM_ZOOM,
   enableAntialiasing = DEFAULT_ENABLE_ANTIALIASING,
   showNavigationControls = DEFAULT_SHOW_NAVIGATION_CONTROLS,
@@ -45,6 +46,7 @@ export default function OptimizedPdfView({
   onError,
   onPageCount,
   onPageChange,
+  onPasswordRequired,
 }: OptimizedPdfViewProps) {
   const [localPath, setLocalPath] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -144,10 +146,12 @@ export default function OptimizedPdfView({
         page={page}
         enableAntialiasing={enableAntialiasing}
         maximumZoom={maximumZoom}
+        password={password || ''}
         style={{ flex: 1 }}
         onLoadComplete={handleLoadComplete}
         onError={onError}
         onPageCount={handlePageCount}
+        onPasswordRequired={onPasswordRequired}
       />
       {showNavigationControls && (
         <PdfNavigationControls

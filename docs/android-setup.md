@@ -26,6 +26,7 @@ dependencies {
 ### 3. Add to `MainApplication.java` or `MainApplication.kt`
 
 **Java:**
+
 ```java
 import com.reactnativeoptimizedpdf.OptimizedPdfPackage;
 
@@ -38,6 +39,7 @@ protected List<ReactPackage> getPackages() {
 ```
 
 **Kotlin:**
+
 ```kotlin
 import com.reactnativeoptimizedpdf.OptimizedPdfPackage
 

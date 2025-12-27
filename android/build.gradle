@@ -53,4 +53,5 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${safeExtGet('kotlinVersion', '1.9.0')}"
     implementation "com.facebook.react:react-android:+"
+    implementation "com.tom-roush:pdfbox-android:2.0.27.0"
 }

@@ -48,10 +48,19 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
         }
     }
 
+    @objc var password: String = "" {
+        didSet {
+            if !password.isEmpty && pdfDocument == nil && needsLoad {
+                setNeedsLayout()
+            }
+        }
+    }
+
     // Eventos enviados para o React Native
     @objc var onError: RCTDirectEventBlock?
     @objc var onLoadComplete: RCTDirectEventBlock?
     @objc var onPageCount: RCTDirectEventBlock?
+    @objc var onPasswordRequired: RCTDirectEventBlock?
 
     // Documento PDF em memória (usando Core Graphics, mais leve que PDFKit para esse caso)
     private var pdfDocument: CGPDFDocument?
@@ -103,6 +112,23 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
         guard let doc = CGPDFDocument(url as CFURL) else {
             onError?(["message": "Failed to open PDF at \(source)"])
             return
+        }
+
+        if doc.isEncrypted {
+            if !doc.unlockWithPassword("") {
+                if password.isEmpty {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.onPasswordRequired?([:])  
+                    }
+                    onError?(["message": "PDF is password protected"])
+                    return
+                }
+                
+                if !doc.unlockWithPassword(password) {
+                    onError?(["message": "Invalid password for PDF"])
+                    return
+                }
+            }
         }
 
         pdfDocument = doc

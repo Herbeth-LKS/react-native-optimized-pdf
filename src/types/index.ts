@@ -41,6 +41,8 @@ export interface PdfErrorEvent {
 export interface OptimizedPdfViewProps {
   /** PDF source configuration */
   source: PdfSource;
+  /** Password for encrypted PDF files */
+  password?: string;
   /** Maximum zoom level. Default: 3 */
   maximumZoom?: number;
   /** Enable antialiasing for better rendering quality. Default: true */
@@ -57,6 +59,8 @@ export interface OptimizedPdfViewProps {
   onPageCount?: (numberOfPages: number) => void;
   /** Callback when page changes */
   onPageChange?: (currentPage: number) => void;
+  /** Callback when PDF requires a password */
+  onPasswordRequired?: () => void;
 }
 
 /**

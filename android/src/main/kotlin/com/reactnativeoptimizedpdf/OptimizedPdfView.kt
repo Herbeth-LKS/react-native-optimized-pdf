@@ -15,7 +15,11 @@ import android.widget.FrameLayout
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.pdmodel.encryption.InvalidPasswordException
 import java.io.File
+import java.io.FileOutputStream
 import kotlin.math.max
 import kotlin.math.min
 
@@ -40,6 +44,7 @@ class OptimizedPdfView @JvmOverloads constructor(
     private var pageIndex: Int = 0
     private var maximumZoom: Float = 5.0f
     private var enableAntialiasing: Boolean = true
+    private var password: String = ""
     
     private var scaleFactor: Float = 1.0f
     private var minScaleFactor: Float = 1.0f
@@ -51,6 +56,8 @@ class OptimizedPdfView @JvmOverloads constructor(
     
     private var needsLoad: Boolean = false
     private var pendingPageIndex: Int? = null
+    private var decryptedFile: File? = null
+    private var pdfBoxInitialized: Boolean = false
     
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -231,6 +238,17 @@ class OptimizedPdfView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun setPassword(pwd: String) {
+        if (this.password != pwd) {
+            this.password = pwd
+            // Se já temos source mas falhou por senha, tenta recarregar
+            if (source.isNotEmpty() && pdfRenderer == null) {
+                needsLoad = true
+                requestLayout()
+            }
+        }
+    }
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         
@@ -259,8 +277,20 @@ class OptimizedPdfView @JvmOverloads constructor(
                 return
             }
             
-            fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-            pdfRenderer = PdfRenderer(fileDescriptor!!)
+            var pdfFile = file
+            
+            try {
+                fileDescriptor = ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
+                pdfRenderer = PdfRenderer(fileDescriptor!!)
+            } catch (e: SecurityException) {
+                fileDescriptor?.close()
+                fileDescriptor = null
+                
+                pdfFile = decryptPdfWithPassword(file) ?: return
+                
+                fileDescriptor = ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY)
+                pdfRenderer = PdfRenderer(fileDescriptor!!)
+            }
             
             val pageCount = pdfRenderer!!.pageCount
             
@@ -272,6 +302,53 @@ class OptimizedPdfView @JvmOverloads constructor(
             
         } catch (e: Exception) {
             sendError("Failed to load PDF: ${e.message}")
+        }
+    }
+    
+    private fun decryptPdfWithPassword(file: File): File? {
+        if (!pdfBoxInitialized) {
+            PDFBoxResourceLoader.init(context)
+            pdfBoxInitialized = true
+        }
+        
+        val document: PDDocument
+        try {
+            document = if (password.isNotEmpty()) {
+                PDDocument.load(file, password)
+            } else {
+                try {
+                    PDDocument.load(file, "")
+                } catch (e: InvalidPasswordException) {
+                    sendPasswordRequired()
+                    sendError("PDF is password protected")
+                    return null
+                }
+            }
+        } catch (e: InvalidPasswordException) {
+            sendError("Invalid password for PDF")
+            return null
+        } catch (e: Exception) {
+            sendError("Failed to decrypt PDF: ${e.message}")
+            return null
+        }
+        
+        try {
+            if (document.isEncrypted) {
+                document.setAllSecurityToBeRemoved(true)
+            }
+            
+            val tempFile = File(context.cacheDir, "decrypted_${System.currentTimeMillis()}.pdf")
+            document.save(FileOutputStream(tempFile))
+            document.close()
+            
+            decryptedFile?.delete()
+            decryptedFile = tempFile
+            
+            return tempFile
+        } catch (e: Exception) {
+            document.close()
+            sendError("Failed to save decrypted PDF: ${e.message}")
+            return null
         }
     }
 
@@ -391,6 +468,13 @@ class OptimizedPdfView @JvmOverloads constructor(
             .receiveEvent(id, "onPageCount", event)
     }
 
+    private fun sendPasswordRequired() {
+        val reactContext = context as? ReactContext ?: return
+        val event = Arguments.createMap()
+        reactContext.getJSModule(RCTEventEmitter::class.java)
+            .receiveEvent(id, "onPasswordRequired", event)
+    }
+
     fun cleanup() {
         currentPage?.close()
         currentPage = null
@@ -403,6 +487,9 @@ class OptimizedPdfView @JvmOverloads constructor(
         
         currentBitmap?.recycle()
         currentBitmap = null
+        
+        decryptedFile?.delete()
+        decryptedFile = null
     }
 
     override fun onDetachedFromWindow() {

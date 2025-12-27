@@ -6,5 +6,6 @@ module.exports = {
   rules: {
     'react-hooks/exhaustive-deps': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'react-native/no-inline-styles': 'off',
   },
 };

@@ -14,6 +14,7 @@ High-performance PDF viewer for React Native with optimized memory usage. Uses C
 - ⚡ **TypeScript support** with full type definitions
 - 🔧 **Modular architecture** with exportable utilities
 - 🤖 **Cross-platform** support for iOS and Android
+- 🔒 **Password-protected PDF** support
 
 ## Installation
 
@@ -85,6 +86,37 @@ function App() {
 }
 ```
 
+### Password Protected PDF
+
+```tsx
+import OptimizedPdfView from 'react-native-optimized-pdf';
+import { useState } from 'react';
+
+function App() {
+  const [password, setPassword] = useState('');
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+
+  return (
+    <>
+      <OptimizedPdfView
+        source={{ uri: 'https://example.com/protected.pdf' }}
+        password={password}
+        onPasswordRequired={() => {
+          setShowPasswordPrompt(true);
+        }}
+        onError={(error) => {
+          if (error.nativeEvent.message.includes('Invalid password')) {
+            alert('Wrong password, please try again');
+          }
+        }}
+        style={{ flex: 1 }}
+      />
+      {/* Your password input modal */}
+    </>
+  );
+}
+```
+
 ### Custom Navigation Controls
 
 ```tsx
@@ -144,6 +176,7 @@ const isValid = await PdfCacheService.isCacheValid({
 | Prop                     | Type                                                    | Default      | Description                            |
 | ------------------------ | ------------------------------------------------------- | ------------ | -------------------------------------- |
 | `source`                 | `PdfSource`                                             | **required** | PDF source configuration               |
+| `password`               | `string`                                                | -            | Password for encrypted PDF files       |
 | `maximumZoom`            | `number`                                                | `3`          | Maximum zoom level                     |
 | `enableAntialiasing`     | `boolean`                                               | `true`       | Enable antialiasing for better quality |
 | `showNavigationControls` | `boolean`                                               | `true`       | Show built-in navigation controls      |
@@ -152,6 +185,7 @@ const isValid = await PdfCacheService.isCacheValid({
 | `onPageCount`            | `(count: number) => void`                               | -            | Called when page count is available    |
 | `onPageChange`           | `(page: number) => void`                                | -            | Called when page changes               |
 | `onError`                | `(error: PdfErrorEvent) => void`                        | -            | Called on error                        |
+| `onPasswordRequired`     | `() => void`                                            | -            | Called when PDF requires a password    |
 
 ### PdfSource
 
@@ -214,10 +248,10 @@ import { PdfErrorOverlay } from 'react-native-optimized-pdf';
 
 ## Platform Support
 
-| Platform | Supported                |
-| -------- | ------------------------ |
-| iOS      | ✅ Yes                   |
-| Android  | ❌ Not yet (coming soon) |
+| Platform | Supported | Min Version |
+| -------- | --------- | ----------- |
+| iOS      | ✅ Yes    | iOS 12.0+   |
+| Android  | ✅ Yes    | API 24+     |
 
 ## Performance Tips
 
@@ -248,6 +282,12 @@ import { PdfErrorOverlay } from 'react-native-optimized-pdf';
 - Verify write permissions
 - Check available storage space
 - Ensure `cache` is not set to `false`
+
+### Password protected PDF not opening
+
+- Use `onPasswordRequired` callback to prompt user for password
+- Pass the password via the `password` prop
+- Check for "Invalid password" in error message to show retry prompt
 
 ## License
 

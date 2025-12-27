@@ -47,11 +47,17 @@ class OptimizedPdfViewManager : SimpleViewManager<OptimizedPdfView>() {
         view.setEnableAntialiasing(enableAntialiasing)
     }
 
+    @ReactProp(name = "password")
+    fun setPassword(view: OptimizedPdfView, password: String?) {
+        view.setPassword(password ?: "")
+    }
+
     override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
         return MapBuilder.builder<String, Any>()
             .put("onLoadComplete", MapBuilder.of("registrationName", "onLoadComplete"))
             .put("onError", MapBuilder.of("registrationName", "onError"))
             .put("onPageCount", MapBuilder.of("registrationName", "onPageCount"))
+            .put("onPasswordRequired", MapBuilder.of("registrationName", "onPasswordRequired"))
             .build()
     }
 
