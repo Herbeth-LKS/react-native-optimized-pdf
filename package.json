@@ -1,6 +1,6 @@
 {
   "name": "react-native-optimized-pdf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra high-performance PDF viewer for React Native. Renders massive PDFs (1000+ pages) with extreme zoom levels while using minimal memory. 10x faster than native PDFKit on iOS, prevents crashes on large documents. Uses CATiledLayer (iOS) and PdfRenderer (Android) for tile-based rendering.",
   "main": "index.ts",
   "types": "index.d.ts",
