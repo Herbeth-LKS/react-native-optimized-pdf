@@ -13,8 +13,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": [
-    "node_modules",
-    "**/__tests__/**"
-  ]
+  "exclude": ["node_modules", "**/__tests__/**"]
 }
