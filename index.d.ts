@@ -6,16 +6,11 @@ import { PdfSource } from './src/OptimizedPdfView';
 export interface OptimizedPdfViewProps {
   source: PdfSource;
   maximumZoom?: number;
+  enableAntialiasing?: boolean;
   style?: ViewStyle;
-  onPdfLoadComplete?: (event: {
-    nativeEvent: { width: number; height: number; page: number }
-  }) => void;
-  onPdfError?: (event: {
-    nativeEvent: { message: string }
-  }) => void;
-  onPdfPageCount?: (event: {
-    nativeEvent: { pages: number }
-  }) => void;
+  onLoadComplete?: (currentPage: number, {width, height}: {width: number, height: number}) => void
+  onError?: (error: {nativeEvent: {message: string}}) => void
+  onPageCount?: (numberOfPages: number) => void
 }
 
 declare const OptimizedPdfView: React.ComponentType<OptimizedPdfViewProps>;

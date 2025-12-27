@@ -5,6 +5,7 @@ import UIKit
 // sem precisar renderizar o PDF inteiro de uma vez.
 class TiledPdfPageView: UIView {
     var pdfPage: CGPDFPage?
+    var enableAntialiasing: Bool = true
 
     // Define o layer como CATiledLayer em vez do CALayer padrão
     override class var layerClass: AnyClass { CATiledLayer.self }
@@ -44,6 +45,8 @@ class TiledPdfPageView: UIView {
               let page = pdfPage else { return }
 
         ctx.saveGState()
+        
+        ctx.setShouldAntialias(enableAntialiasing)
 
         // Fundo branco no pedaço atual
         ctx.setFillColor(UIColor.white.cgColor)

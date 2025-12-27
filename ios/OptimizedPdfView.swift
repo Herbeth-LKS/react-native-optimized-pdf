@@ -41,10 +41,17 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
         }
     }
 
+    @objc var enableAntialiasing: Bool = true {
+        didSet {
+            tiledView?.enableAntialiasing = enableAntialiasing
+            tiledView?.setNeedsDisplay()
+        }
+    }
+
     // Eventos enviados para o React Native
-    @objc var onPdfError: RCTDirectEventBlock?
-    @objc var onPdfLoadComplete: RCTDirectEventBlock?
-    @objc var onPdfPageCount: RCTDirectEventBlock?
+    @objc var onError: RCTDirectEventBlock?
+    @objc var onLoadComplete: RCTDirectEventBlock?
+    @objc var onPageCount: RCTDirectEventBlock?
 
     // Documento PDF em memória (usando Core Graphics, mais leve que PDFKit para esse caso)
     private var pdfDocument: CGPDFDocument?
@@ -80,6 +87,7 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
         // Inicializa o tiledView que renderiza as páginas em blocos (tiles)
         tiledView = TiledPdfPageView(frame: bounds)
         tiledView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tiledView.enableAntialiasing = enableAntialiasing
         addSubview(tiledView)
     }
 
@@ -93,7 +101,7 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
 
         // Tenta abrir o documento PDF
         guard let doc = CGPDFDocument(url as CFURL) else {
-            onPdfError?(["message": "Failed to open PDF at \(source)"])
+            onError?(["message": "Failed to open PDF at \(source)"])
             return
         }
 
@@ -102,7 +110,7 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
         // Emite evento na próxima iteração do runloop p/ garantir listeners conectados
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.onPdfPageCount?(["pages": NSNumber(value: doc.numberOfPages)])
+            self.onPageCount?(["numberOfPages": NSNumber(value: doc.numberOfPages)])
         }
 
         // Página desejada (ou 0 se não tiver)
@@ -138,7 +146,7 @@ class OptimizedPdfView: UIScrollView, UIScrollViewDelegate {
        // Evento enviado ao RN quando a página carrega
         let w = pageRect.width, h = pageRect.height
         DispatchQueue.main.async { [weak self] in
-            self?.onPdfLoadComplete?(["width": w, "height": h, "page": index + 1])
+            self?.onLoadComplete?([ "currentPage": index + 1, "width": w, "height": h])
         }
     }
 

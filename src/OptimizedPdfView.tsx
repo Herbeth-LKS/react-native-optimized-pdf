@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import RNFS from 'react-native-fs'
 import md5 from 'crypto-js/md5'
-import { ViewStyle } from 'react-native'
 const {
   View,
   Text,
@@ -9,6 +8,7 @@ const {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  ViewStyle,
 } = require('react-native')
 
 export interface PdfSource {
@@ -23,12 +23,11 @@ export interface PdfSource {
 export interface OptimizedPdfViewProps {
   source: PdfSource
   maximumZoom?: number
-  style?: ViewStyle
-  onPdfLoadComplete?: (event: {
-    nativeEvent: { width: number; height: number; page: number }
-  }) => void
-  onPdfError?: (event: { nativeEvent: { message: string } }) => void
-  onPdfPageCount?: (event: { nativeEvent: { pages: number } }) => void
+  enableAntialiasing?: boolean
+  style?: typeof ViewStyle
+  onLoadComplete?: ( currentPage: number,  {width, height}: {width: number, height: number} ) => void 
+  onError?: (error: {nativeEvent: {message: string}}) => void
+  onPageCount?:  (numberOfPages: number) => void
 }
 
 const NativeOptimizedPdfView =
@@ -81,10 +80,11 @@ async function downloadPdf(
 export default function OptimizedPdfView({
   source,
   maximumZoom,
+  enableAntialiasing = true,
   style,
-  onPdfLoadComplete,
-  onPdfError,
-  onPdfPageCount,
+  onLoadComplete,
+  onError,
+  onPageCount,
 }: OptimizedPdfViewProps) {
   const [localPath, setLocalPath] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -177,17 +177,20 @@ export default function OptimizedPdfView({
       <NativeOptimizedPdfView
         source={localPath}
         page={page}
+        enableAntialiasing={enableAntialiasing}
         maximumZoom={maximumZoom}
         style={{ flex: 1 }}
-        onPdfLoadComplete={onPdfLoadComplete}
-        onPdfError={onPdfError}
-        onPdfPageCount={({
-          nativeEvent,
+        onLoadComplete={({nativeEvent}: { nativeEvent: { currentPage: number; width: number; height: number } })=> {
+          onLoadComplete?.(nativeEvent.currentPage, {width: nativeEvent.width, height: nativeEvent.height})
+        }}
+        onError={onError}
+        onPageCount={({
+          nativeEvent
         }: {
-          nativeEvent: { pages: number }
+          nativeEvent: { numberOfPages: number }
         }) => {
-          setTotalPages(nativeEvent.pages)
-          if (onPdfPageCount) onPdfPageCount({ nativeEvent })
+          setTotalPages(nativeEvent.numberOfPages)
+          onPageCount?.(nativeEvent.numberOfPages)
         }}
       />
       <View style={styles.navButtons}>
