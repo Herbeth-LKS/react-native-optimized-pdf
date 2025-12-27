@@ -12,7 +12,9 @@ import {
 import type { OptimizedPdfViewProps, NativeLoadCompleteEvent, NativePageCountEvent } from './types';
 
 const NativeOptimizedPdfView =
-  Platform.OS === 'ios' ? requireNativeComponent('OptimizedPdfView') : () => null;
+  Platform.OS === 'ios' || Platform.OS === 'android'
+    ? requireNativeComponent('OptimizedPdfView')
+    : () => null;
 
 /**
  * OptimizedPdfView - High-performance PDF viewer for React Native
@@ -89,7 +91,7 @@ export default function OptimizedPdfView({
     return () => {
       cancelled = true;
     };
-  }, [source.uri, source.cache, source.cacheFileName, source.expiration]);
+  }, [source.uri, source.cache, source.cacheFileName, source.expiration, onError, source]);
 
   const handleNextPage = () => {
     if (page < totalPages - 1) {

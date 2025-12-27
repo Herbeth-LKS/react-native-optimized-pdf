@@ -1,10 +1,10 @@
 # React Native Optimized PDF
 
-High-performance PDF viewer for React Native with optimized memory usage using CATiledLayer and automatic caching.
+High-performance PDF viewer for React Native with optimized memory usage. Uses CATiledLayer on iOS and PdfRenderer on Android for smooth rendering with automatic caching.
 
 ## Features
 
-- 🚀 **Optimized memory usage** with CATiledLayer for smooth rendering
+- 🚀 **Optimized memory usage** with CATiledLayer (iOS) and PdfRenderer (Android)
 - 📦 **Automatic caching** with configurable expiration
 - 📱 **Smooth zoom and scroll** with customizable maximum zoom
 - 🎯 **Built-in page navigation** with optional custom controls
@@ -13,6 +13,7 @@ High-performance PDF viewer for React Native with optimized memory usage using C
 - 📈 **Download progress tracking** for remote PDFs
 - ⚡ **TypeScript support** with full type definitions
 - 🔧 **Modular architecture** with exportable utilities
+- 🤖 **Cross-platform** support for iOS and Android
 
 ## Installation
 
@@ -27,6 +28,10 @@ yarn add react-native-optimized-pdf
 ```bash
 cd ios && pod install
 ```
+
+### Android Setup
+
+No additional setup required! The module will be automatically linked.
 
 ## Usage
 

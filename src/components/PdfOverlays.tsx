@@ -8,7 +8,7 @@ import type { PdfLoadingOverlayProps, PdfErrorOverlayProps } from '../types';
 export const PdfLoadingOverlay: React.FC<PdfLoadingOverlayProps> = ({ progress, style }) => {
   return (
     <View style={[styles.container, style]}>
-      <ActivityIndicator size="large" color="#000" />
+      <ActivityIndicator size="large" color="#fff" />
       <Text style={styles.progressText}>{progress}%</Text>
     </View>
   );
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   progressText: {
-    color: '#000',
+    color: '#fff',
     marginTop: 10,
     fontSize: 16,
     fontWeight: '600',
