@@ -9,12 +9,12 @@ Pod::Spec.new do |s|
   s.description  = <<-DESC
                   High-performance PDF viewer for React Native
                    DESC
-  s.homepage     = "https://github.com/your-username/react-native-optimized-pdf"
+  s.homepage     = "https://github.com/Herbeth-LKS/react-native-optimized-pdf"
   s.license      = "MIT"
-  s.author       = { "Your Name" => "your-email@example.com" }
+  s.author       = { "Herbeth Lucas" => "herbethlucas007@gmail.com" }
   s.platform     = :ios, "12.0"
-  s.source       = { :git => "https://github.com/your-username/react-native-optimized-pdf.git", :tag => "#{s.version}" }
-  s.source_files = "ios/*.{swift,h,m}"
+  s.source       = { :git => "https://github.com/Herbeth-LKS/react-native-optimized-pdf.git", :tag => "#{s.version}" }
+  s.source_files = "ios/**/*.{swift,h,m}"
   s.requires_arc = true
   s.swift_version = "5.0"
   s.dependency "React-Core"
